@@ -139,10 +139,6 @@ public class Config
 		return config != null ? config.getGodmode().isAutoGiveGodmodeRegionLeft() : false;
 	}
 
-	public static int getDisableChamberedEnderPearlTrackingExpirySeconds()
-	{
-		return config != null ? config.getDisableChamberedEnderPearl().getPearlTrackingExpirySeconds() : 120;
-	}
 
 
 	// Flag control methods
@@ -215,7 +211,7 @@ public class Config
 
 			// Special Features
 			case "disable-collision": return flags.isDisableCollision();
-			case "disable-chambered-enderpearl": return flags.isDisableChamberedEnderpearl();
+			case "chambered-enderpearl": return flags.isChamberedEnderPearl();
 
 			default: return true; // Default to enabled for unknown flags
 		}

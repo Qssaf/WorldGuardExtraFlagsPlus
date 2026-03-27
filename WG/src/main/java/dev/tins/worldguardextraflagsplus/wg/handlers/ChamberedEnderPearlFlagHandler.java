@@ -17,6 +17,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
@@ -34,20 +35,8 @@ import java.util.Iterator;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class DisableChamberedEnderPearlFlagHandler extends FlagValueChangeHandler<State> implements Listener
+public class ChamberedEnderPearlFlagHandler extends FlagValueChangeHandler<State> implements Listener
 {
-    // Pearl expiry time is now configurable via config-wgefp.yml
-    private static long getPearlExpiryMillis() {
-        try {
-            Class<?> configClass = Class.forName("dev.tins.worldguardextraflagsplus.Config");
-            java.lang.reflect.Method getMethod = configClass.getMethod("getDisableChamberedEnderPearlTrackingExpirySeconds");
-            Integer seconds = (Integer) getMethod.invoke(null);
-            return seconds != null ? seconds * 1000L : 120000L; // Default to 120 seconds
-        } catch (Exception e) {
-            // Fallback to default if reflection fails
-            return 120000L; // 120 seconds
-        }
-    }
 
     // Maps player UUID to their tracked ender pearls (thrown outside flagged regions)
     private static final Multimap<UUID, Pearl> trackedPearls = HashMultimap.create();
@@ -60,18 +49,18 @@ public class DisableChamberedEnderPearlFlagHandler extends FlagValueChangeHandle
 		return new Factory();
 	}
 
-    public static class Factory extends Handler.Factory<DisableChamberedEnderPearlFlagHandler>
+    public static class Factory extends Handler.Factory<ChamberedEnderPearlFlagHandler>
     {
 		@Override
-        public DisableChamberedEnderPearlFlagHandler create(Session session)
+        public ChamberedEnderPearlFlagHandler create(Session session)
         {
-            return new DisableChamberedEnderPearlFlagHandler(session);
+            return new ChamberedEnderPearlFlagHandler(session);
         }
     }
 
-	protected DisableChamberedEnderPearlFlagHandler(Session session)
+	protected ChamberedEnderPearlFlagHandler(Session session)
 	{
-		super(session, Flags.DISABLE_CHAMBERED_ENDERPEARL);
+		super(session, Flags.CHAMBERED_ENDERPEARL);
 	}
 
 	@Override
@@ -110,6 +99,44 @@ public class DisableChamberedEnderPearlFlagHandler extends FlagValueChangeHandle
 		if (nowInFlaggedRegion != wasInFlaggedRegion)
 		{
 			playersInFlaggedRegions.put(playerUUID, nowInFlaggedRegion);
+
+			// If player just entered a DENY region, kill all their cached pearls and remove from cache
+			if (nowInFlaggedRegion && !wasInFlaggedRegion)
+			{
+				Collection<Pearl> pearls = trackedPearls.asMap().get(playerUUID);
+				if (pearls != null)
+				{
+					for (Pearl pearl : pearls)
+					{
+						EnderPearl enderPearl = pearl.pearl.get();
+						if (enderPearl != null)
+						{
+							// Kill the pearl entity immediately
+							try
+							{
+								if (!enderPearl.isDead())
+								{
+									enderPearl.remove();
+								}
+							}
+							catch (Exception e)
+							{
+								// Pearl might be in unloaded chunk or invalid, try scheduled removal
+								WorldGuardUtils.getScheduler().runNextTick(task -> {
+									try {
+										if (enderPearl != null && !enderPearl.isDead()) {
+											enderPearl.remove();
+										}
+									} catch (Exception ex) {
+										// Ignore - pearl is probably already gone
+									}
+								});
+							}
+						}
+					}
+				}
+				trackedPearls.removeAll(playerUUID);
+			}
 		}
 	}
 
@@ -134,8 +161,13 @@ public class DisableChamberedEnderPearlFlagHandler extends FlagValueChangeHandle
 			return;
 		}
 
-		removeExpired(player);
+			// Add pearl to cache when thrown
 		trackedPearls.put(playerUUID, new Pearl(enderPearl));
+
+		// Periodic cleanup of invalid pearls (every ~10 pearls to avoid performance impact)
+		if (trackedPearls.size() % 10 == 0) {
+			cleanupInvalidPearls();
+		}
 	}
 
 	@EventHandler
@@ -163,6 +195,48 @@ public class DisableChamberedEnderPearlFlagHandler extends FlagValueChangeHandle
 			if (enderPearl.equals(pearl.pearl.get())) {
 				iterator.remove();
 				break;
+			}
+		}
+	}
+
+	@EventHandler
+	public static void onEntityDeath(EntityDeathEvent event) {
+		if (!(event.getEntity() instanceof EnderPearl enderPearl)) {
+			return;
+		}
+
+		if (!(enderPearl.getShooter() instanceof Player player)) {
+			return;
+		}
+
+		UUID playerUUID = player.getUniqueId();
+		final Collection<Pearl> pearls = trackedPearls.asMap().get(playerUUID);
+
+		if (pearls == null || pearls.isEmpty()) {
+			return;
+		}
+
+		final Iterator<Pearl> iterator = pearls.iterator();
+
+		while (iterator.hasNext()) {
+			final Pearl pearl = iterator.next();
+
+			if (enderPearl.equals(pearl.pearl.get())) {
+				iterator.remove();
+				break;
+			}
+		}
+	}
+
+	// Periodic cleanup of invalid pearls (run occasionally)
+	public static void cleanupInvalidPearls() {
+		for (UUID playerUUID : trackedPearls.keySet()) {
+			Collection<Pearl> pearls = trackedPearls.asMap().get(playerUUID);
+			if (pearls != null) {
+				pearls.removeIf(pearl -> {
+					EnderPearl enderPearl = pearl.pearl.get();
+					return enderPearl == null || !enderPearl.isValid() || enderPearl.isDead();
+				});
 			}
 		}
 	}
@@ -214,23 +288,10 @@ public class DisableChamberedEnderPearlFlagHandler extends FlagValueChangeHandle
 		playersInFlaggedRegions.remove(playerUUID);
 	}
 
-	private static void removeExpired(final Player player) {
-		final Collection<Pearl> pearls = trackedPearls.asMap().get(player.getUniqueId());
-
-		if (pearls == null || pearls.isEmpty()) {
-			return;
-		}
-
-		final long now = System.currentTimeMillis();
-		pearls.removeIf(pearl -> now - pearl.creation > getPearlExpiryMillis());
-	}
-
 	private static class Pearl {
-		private final long creation;
 		private final WeakReference<EnderPearl> pearl;
 
 		public Pearl(final EnderPearl pearl) {
-			this.creation = System.currentTimeMillis();
 			this.pearl = new WeakReference<>(pearl);
 		}
 	}
