@@ -158,6 +158,7 @@ public final class PluginConfig {
 		private boolean denyItemDrops = true;
 		private boolean denyItemPickup = true;
 		private boolean disableCompletely = true;
+		private boolean disableThrow = true;
 		private boolean permitWorkbenches = true;
 
 		@Comment({

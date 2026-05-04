@@ -61,6 +61,9 @@ public final class PluginMessages {
 	@Comment("Disable completely flag message")
 	private String disableCompletelyBlocked = "&cHey! &7You can not use {item} in here!";
 	
+	@Comment("Disable throw flag — egg, snowball, ender pearl, experience bottle (see ThrowableItemFlag)")
+	private String disableThrowBlocked = "&cHey! &7You can not throw {item} here!";
+
 	@Comment("Permit workbenches flag message")
 	private String permitWorkbenchesBlocked = "&cHey! &7You can not use {workbench} in here!";
 	

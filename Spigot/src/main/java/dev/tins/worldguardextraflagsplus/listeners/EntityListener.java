@@ -32,6 +32,7 @@ import com.sk89q.worldguard.protection.flags.StateFlag.State;
 import dev.tins.worldguardextraflagsplus.flags.Flags;
 import dev.tins.worldguardextraflagsplus.flags.helpers.BlockableItemFlag;
 import dev.tins.worldguardextraflagsplus.disablecompletely.DisableCompletelyQuery;
+import dev.tins.worldguardextraflagsplus.disablethrow.DisableThrowQuery;
 import dev.tins.worldguardextraflagsplus.Messages;
 import dev.tins.worldguardextraflagsplus.Config;
 
@@ -46,6 +47,7 @@ public class EntityListener implements Listener
 	private final SessionManager sessionManager;
 
 	private final DisableCompletelyQuery disableCompletelyQuery;
+	private final DisableThrowQuery disableThrowQuery;
 
 	public EntityListener(WorldGuardPlugin worldGuardPlugin, RegionContainer regionContainer, SessionManager sessionManager)
 	{
@@ -53,6 +55,7 @@ public class EntityListener implements Listener
 		this.regionContainer = regionContainer;
 		this.sessionManager = sessionManager;
 		this.disableCompletelyQuery = new DisableCompletelyQuery(worldGuardPlugin, regionContainer, sessionManager);
+		this.disableThrowQuery = new DisableThrowQuery(worldGuardPlugin, regionContainer, sessionManager);
 	}
 	
 	// Workbench type mappings
@@ -321,7 +324,22 @@ public class EntityListener implements Listener
         {
             return;
         }
-        // Try to infer from main hand item
+
+        if (Config.isFlagEnabled("disable-throw"))
+        {
+            Material throwableMat = DisableThrowQuery.throwableMaterialFromProjectile(event.getEntity());
+            if (throwableMat != Material.AIR)
+            {
+                Material resolved = DisableThrowQuery.resolveThrownMaterial(player, throwableMat);
+                if (this.disableThrowQuery.isDisabled(player, resolved))
+                {
+                    event.setCancelled(true);
+                    this.disableThrowQuery.sendBlocked(player, resolved);
+                    return;
+                }
+            }
+        }
+
         ItemStack item = player.getInventory().getItemInMainHand();
         Material mat = item != null ? item.getType() : Material.AIR;
         if (mat != Material.AIR && this.isBlocked(player, mat))

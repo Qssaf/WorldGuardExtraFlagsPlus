@@ -124,6 +124,7 @@ public class WorldGuardExtraFlagsPlusPlugin extends JavaPlugin
 			if (Config.isFlagEnabled("item-durability")) flagRegistry.register(Flags.ITEM_DURABILITY);
 			if (Config.isFlagEnabled("join-location")) flagRegistry.register(Flags.JOIN_LOCATION);
 			if (Config.isFlagEnabled("disable-completely")) flagRegistry.register(Flags.DISABLE_COMPLETELY);
+			if (Config.isFlagEnabled("disable-throw")) flagRegistry.register(Flags.DISABLE_THROW);
 			if (Config.isFlagEnabled("permit-workbenches")) flagRegistry.register(Flags.PERMIT_WORKBENCHES);
 			if (Config.isFlagEnabled("entry-min-level")) flagRegistry.register(Flags.ENTRY_MIN_LEVEL);
 			if (Config.isFlagEnabled("entry-max-level")) flagRegistry.register(Flags.ENTRY_MAX_LEVEL);
@@ -321,7 +322,7 @@ public class WorldGuardExtraFlagsPlusPlugin extends JavaPlugin
 		}
 
 		// EntityListener handles multiple flags
-		if (Config.isFlagEnabled("disable-completely") || Config.isFlagEnabled("permit-workbenches") ||
+		if (Config.isFlagEnabled("disable-completely") || Config.isFlagEnabled("disable-throw") || Config.isFlagEnabled("permit-workbenches") ||
 		    Config.isFlagEnabled("inventory-craft") || Config.isFlagEnabled("nether-portals") ||
 		    Config.isFlagEnabled("allow-block-break") || Config.isFlagEnabled("allow-block-place") ||
 		    Config.isFlagEnabled("glide"))

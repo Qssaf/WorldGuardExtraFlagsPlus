@@ -202,6 +202,7 @@ public class Config
 			case "deny-item-drops": return flags.isDenyItemDrops();
 			case "deny-item-pickup": return flags.isDenyItemPickup();
 			case "disable-completely": return flags.isDisableCompletely();
+			case "disable-throw": return flags.isDisableThrow();
 			case "permit-workbenches": return flags.isPermitWorkbenches();
 
 			// Entry Control

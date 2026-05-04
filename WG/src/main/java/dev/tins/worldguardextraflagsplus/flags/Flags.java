@@ -78,6 +78,8 @@ public final class Flags
 	public final static BooleanFlag DISABLE_COLLISION = new BooleanFlag("disable-collision");
 
 	public final static SetFlag<String> DISABLE_COMPLETELY = new CustomSetFlag("disable-completely", new BlockableItemFlag(null));
+
+	public final static SetFlag<String> DISABLE_THROW = new CustomSetFlag("disable-throw", new ThrowableItemFlag(null));
 	
 	public final static SetFlag<String> PERMIT_WORKBENCHES = new CustomSetFlag("permit-workbenches", new PermitWorkbenchesFlag(null));
 
