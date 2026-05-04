@@ -17,7 +17,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
-				<version>3.6.1</version>
+				<version>${maven.shade.plugin.version}</version>
 				<executions>
 					<execution>
 						<phase>package</phase>
@@ -66,20 +66,16 @@
 			<url>https://maven.enginehub.org/repo/</url>
 		</repository>
 		<repository>
-			<id>tcoded-releases</id>
-			<url>https://repo.tcoded.com/releases</url>
-		</repository>
-		<repository>
 			<id>central</id>
 			<url>https://repo1.maven.org/maven2/</url>
 		</repository>
 		<repository>
-			<id>essentials-releases</id>
-			<url>https://repo.essentialsx.net/releases/</url>
+			<id>tcoded-releases</id>
+			<url>https://repo.tcoded.com/releases</url>
 		</repository>
 		<repository>
-			<id>paper-repo</id>
-			<url>https://papermc.io/repo/repository/maven-public/</url>
+			<id>essentials-releases</id>
+			<url>https://repo.essentialsx.net/releases/</url>
 		</repository>
 		<repository>
 			<id>codemc-releases</id>
@@ -88,6 +84,11 @@
 		<repository>
 			<id>modrinth</id>
 			<url>https://api.modrinth.com/maven/</url>
+		</repository>
+		<!-- Paper-hosted deps last: avoids failed metadata lookups for EngineHub/Spigot coords -->
+		<repository>
+			<id>paper-repo</id>
+			<url>https://papermc.io/repo/repository/maven-public/</url>
 		</repository>
 	</repositories>
 
@@ -102,27 +103,27 @@
 		<dependency>
 			<groupId>org.spigotmc</groupId>
 			<artifactId>spigot-api</artifactId>
-			<version>1.21-R0.1-SNAPSHOT</version>
+			<version>${spigot.api.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>io.papermc.paper</groupId>
 			<artifactId>paper-api</artifactId>
-			<version>1.21.11-R0.1-SNAPSHOT</version>
+			<version>${paper.api.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<!-- FAWE ships an extended WorldEdit core API (batch extent methods). Provided: servers use WE or FAWE at runtime. -->
 		<dependency>
 			<groupId>com.fastasyncworldedit</groupId>
 			<artifactId>FastAsyncWorldEdit-Core</artifactId>
-			<version>2.11.2</version>
+			<version>${fastasyncworldedit.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<!-- Bukkit-side WE classes are not in FAWE-Core. Exclude transitive core so patched extent API comes only from FAWE-Core. -->
 		<dependency>
 			<groupId>com.sk89q.worldedit</groupId>
 			<artifactId>worldedit-bukkit</artifactId>
-			<version>7.3.17</version>
+			<version>${worldedit.version}</version>
 			<scope>provided</scope>
 			<exclusions>
 				<exclusion>
@@ -134,7 +135,7 @@
 		<dependency>
 			<groupId>com.sk89q.worldguard</groupId>
 			<artifactId>worldguard-core</artifactId>
-			<version>7.0.15-SNAPSHOT</version>
+			<version>${worldguard.version}</version>
 			<scope>provided</scope>
 			<exclusions>
 				<exclusion>
@@ -150,7 +151,7 @@
 		<dependency>
 			<groupId>com.sk89q.worldguard</groupId>
 			<artifactId>worldguard-bukkit</artifactId>
-			<version>7.0.15-SNAPSHOT</version>
+			<version>${worldguard.version}</version>
 			<scope>provided</scope>
 			<exclusions>
 				<exclusion>
@@ -166,37 +167,37 @@
 		<dependency>
 			<groupId>net.dmulloy2</groupId>
 			<artifactId>ProtocolLib</artifactId>
-			<version>5.4.0</version>
+			<version>${protocollib.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.github.retrooper</groupId>
 			<artifactId>packetevents-api</artifactId>
-			<version>2.11.2</version>
+			<version>${packetevents.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.bstats</groupId>
 			<artifactId>bstats-bukkit</artifactId>
-			<version>3.0.2</version>
+			<version>${bstats.version}</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.tcoded</groupId>
 			<artifactId>FoliaLib</artifactId>
-			<version>0.5.1</version>
+			<version>${folialib.version}</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>net.essentialsx</groupId>
 			<artifactId>EssentialsX</artifactId>
-			<version>2.21.2</version>
+			<version>${essentialsx.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>de.exlll</groupId>
 			<artifactId>configlib-yaml</artifactId>
-			<version>4.6.4</version>
+			<version>${configlib.version}</version>
 			<scope>compile</scope>
 		</dependency>
 	</dependencies>
