@@ -173,6 +173,11 @@ public final class PluginConfig {
 			"----------------"
 		})
 		private boolean disableCollision = true;
+		@Comment({
+			"EXPERIMENTAL — chambered-enderpearl flag",
+			"Mitigation for chambered ender pearl bypasses; behavior may change in future releases.",
+			"Default: true"
+		})
 		private boolean chamberedEnderPearl = true;
 	}
 }

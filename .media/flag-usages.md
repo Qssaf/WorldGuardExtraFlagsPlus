@@ -10,7 +10,19 @@ Use the WorldGuard region flag commands as usual — all ExtraFlagsPlus flags in
 ```bash
 /rg flag spawn disable-completely MACE
 /rg flag spawn disable-completely MACE,FIREWORK_ROCKET
+/rg flag spawn disable-completely SPEAR
+/rg flag spawn disable-completely IRON_SPEAR
 /rg flag spawn disable-completely clear (especially for inherited child regions)
+```
+
+Blocking spear **Lunge** (including **Lunge** enchant) requires **PacketEvents** or **ProtocolLib**. Install **PacketEvents** for primary support; **ProtocolLib** is used as a fallback when PacketEvents is unavailable.
+
+#### Chambered ender pearl *(experimental)*
+**Experimental** — behavior may change in future releases.
+```bash
+/rg flag spawn chambered-enderpearl deny
+/rg flag spawn chambered-enderpearl allow
+/rg flag spawn chambered-enderpearl clear
 ```
 
 #### Level Restrictions
@@ -114,6 +126,7 @@ Use the WorldGuard region flag commands as usual — all ExtraFlagsPlus flags in
 
 ### Special Features
 - `disable-collision`
+- `chambered-enderpearl` *(experimental)*
 
 ## Notes
 
