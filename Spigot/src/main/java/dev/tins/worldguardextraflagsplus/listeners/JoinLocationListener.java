@@ -13,9 +13,10 @@ import org.spigotmc.event.player.PlayerSpawnLocationEvent;
 import lombok.RequiredArgsConstructor;
 
 /**
- * Dedicated listener for join-location flag functionality.
- * Only registered when join-location.enabled is true in config.
- * This avoids the deprecation warning when the flag is disabled.
+ * Dedicated listener for {@code join-location} on runtimes without Paper's
+ * {@link io.papermc.paper.event.player.AsyncPlayerSpawnLocationEvent} (e.g. plain Spigot).
+ * On Paper/Folia, {@link AsyncJoinLocationListener} is used instead to avoid deprecated
+ * {@link PlayerSpawnLocationEvent}.
  */
 @RequiredArgsConstructor
 public class JoinLocationListener implements Listener
@@ -27,13 +28,8 @@ public class JoinLocationListener implements Listener
 	 * Handles player spawn location for join-location flag functionality.
 	 * This event provides access to the player object needed for WorldGuard region queries.
 	 *
-	 * Although deprecated on Paper, it's still functional and necessary for the join-location flag.
-	 * AsyncPlayerSpawnLocationEvent cannot be used because:
-	 * 1. It occurs during configuration phase when the player object doesn't exist yet
-	 * 2. WorldGuard's ApplicableRegionSet.queryValue() requires a RegionAssociable (LocalPlayer) parameter
-	 * 3. Without player context, region permission checks cannot be performed
-	 *
-	 * The deprecation warning on Paper is unavoidable but the functionality remains correct.
+	 * Deprecated on Paper in favor of {@link io.papermc.paper.event.player.AsyncPlayerSpawnLocationEvent}.
+	 * This handler remains for Spigot; Paper servers use {@link AsyncJoinLocationListener} instead.
 	 */
 	@EventHandler(priority = org.bukkit.event.EventPriority.HIGHEST)
 	public void onPlayerSpawnLocationEvent(PlayerSpawnLocationEvent event)

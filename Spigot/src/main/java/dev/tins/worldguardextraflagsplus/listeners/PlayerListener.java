@@ -26,9 +26,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 
-// Paper-specific imports (only available when running on Paper)
-// import io.papermc.paper.event.player.AsyncPlayerSpawnLocationEvent; // Cannot be used - requires player context
-
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.flags.StateFlag.State;
 import com.sk89q.worldguard.session.Session;
@@ -254,20 +251,6 @@ public class PlayerListener implements Listener
 		}
 	}
 
-	/**
-	 * Handles player spawn location for join-location flag functionality.
-	 * This event provides access to the player object needed for WorldGuard region queries.
-	 *
-	 * Although deprecated on Paper, it's still functional and necessary for the join-location flag.
-	 * AsyncPlayerSpawnLocationEvent cannot be used because:
-	 * 1. It occurs during configuration phase when the player object doesn't exist yet
-	 * 2. WorldGuard's ApplicableRegionSet.queryValue() requires a RegionAssociable (LocalPlayer) parameter
-	 * 3. Without player context, region permission checks cannot be performed
-	 *
-	 * The deprecation warning on Paper is unavoidable but the functionality remains correct.
-	 */
-
-	
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onPlayerJoinEvent(PlayerJoinEvent event)
 	{

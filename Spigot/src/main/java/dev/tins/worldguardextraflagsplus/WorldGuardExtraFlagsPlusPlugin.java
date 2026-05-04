@@ -289,11 +289,18 @@ public class WorldGuardExtraFlagsPlusPlugin extends JavaPlugin
 		// Register PlayerListener (contains multiple event handlers)
 		this.getServer().getPluginManager().registerEvents(new PlayerListener(this, this.worldGuardPlugin, this.regionContainer, this.sessionManager), this);
 
-		// Conditionally register JoinLocationListener only if join-location flag is enabled
+		// Conditionally register join-location listener only if flag is enabled
 		if (Config.isFlagEnabled("join-location"))
 		{
-			this.getServer().getPluginManager().registerEvents(new JoinLocationListener(this.worldGuardPlugin, this.regionContainer), this);
-			this.sendJoinLocationDeprecationWarning();
+			if (hasAsyncPlayerSpawnLocationEvent())
+			{
+				this.getServer().getPluginManager().registerEvents(new AsyncJoinLocationListener(this.regionContainer), this);
+			}
+			else
+			{
+				this.getServer().getPluginManager().registerEvents(new JoinLocationListener(this.worldGuardPlugin, this.regionContainer), this);
+				this.sendJoinLocationDeprecationWarning();
+			}
 		} else {
       this.getLogger().info(" ");
 			this.getLogger().info("[Join Location Flag] Disabled in config-wgefp.yml it will not load the flag");
@@ -366,14 +373,31 @@ public class WorldGuardExtraFlagsPlusPlugin extends JavaPlugin
 		this.getCommand("wgefp").setTabCompleter(new dev.tins.worldguardextraflagsplus.commands.ReloadCommand(this));
 	}
 
-  private void sendJoinLocationDeprecationWarning()
-  {
-    this.getLogger().info(" >> >> ");
-    this.getLogger().info(" >> >> If you are not using \"join-location\" flag, you can disable it in the \"config-wgefp.yml\" ");
-    this.getLogger().info(" >> >> This will avoid the deprecation warning on server load");
-    this.getLogger().info(" >> >> Otherwise, the plugin will work correctly, deprecation warning will not broke working of it.");
+	/**
+	 * True when the runtime ships Paper's async spawn API (Paper/Folia). Pure Spigot falls back to
+	 * {@link JoinLocationListener} + {@link org.spigotmc.event.player.PlayerSpawnLocationEvent}.
+	 */
+	private static boolean hasAsyncPlayerSpawnLocationEvent()
+	{
+		try
+		{
+			Class.forName("io.papermc.paper.event.player.AsyncPlayerSpawnLocationEvent");
+			return true;
+		}
+		catch (ClassNotFoundException e)
+		{
+			return false;
+		}
+	}
+
+	private void sendJoinLocationDeprecationWarning()
+	{
 		this.getLogger().info(" >> >> ");
-  }
+		this.getLogger().info(" >> >> If you are not using \"join-location\" flag, you can disable it in the \"config-wgefp.yml\" ");
+		this.getLogger().info(" >> >> This will avoid the deprecation warning on server load");
+		this.getLogger().info(" >> >> Otherwise, the plugin will work correctly, deprecation warning will not broke working of it.");
+		this.getLogger().info(" >> >> ");
+	}
 
 	public void doUnloadChunkFlagCheck(org.bukkit.World world)
 	{
