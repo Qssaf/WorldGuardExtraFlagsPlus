@@ -27,6 +27,7 @@
 					</execution>
 				</executions>
 				<configuration>
+					<createDependencyReducedPom>false</createDependencyReducedPom>
 					<relocations>
 						<relocation>
 							<pattern>org.bstats</pattern>
@@ -41,17 +42,72 @@
 							<shadedPattern>dev.tins.worldguardextraflagsplus.configlib</shadedPattern>
 						</relocation>
 					</relocations>
+					<!-- Do not use a blanket *:* content filter — it can drop shaded dependency classes in some builds. -->
 					<filters>
+						<filter>
+							<artifact>com.tcoded:FoliaLib</artifact>
+							<includes>
+								<include>**</include>
+							</includes>
+						</filter>
+						<filter>
+							<artifact>de.exlll:configlib-yaml</artifact>
+							<includes>
+								<include>**</include>
+							</includes>
+						</filter>
+						<filter>
+							<artifact>org.bstats:bstats-bukkit</artifact>
+							<includes>
+								<include>**</include>
+							</includes>
+						</filter>
 						<filter>
 							<artifact>*:*</artifact>
 							<excludes>
-								<exclude>**/*.java</exclude>
-								<exclude>**/*.SF</exclude>
-								<exclude>**/*.DSA</exclude>
+								<exclude>META-INF/*.SF</exclude>
+								<exclude>META-INF/*.DSA</exclude>
+								<exclude>META-INF/*.RSA</exclude>
 							</excludes>
 						</filter>
 					</filters>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>3.1.0</version>
+				<executions>
+					<execution>
+						<id>verify-shaded-folialib</id>
+						<phase>package</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<target>
+								<fail message="Shaded jar missing FoliaLib WrappedBukkitTask — command/console-on-entry schedulers will crash at runtime.">
+									<condition>
+										<not>
+											<resourcecount count="1">
+												<zipfileset src="${project.build.directory}/${project.build.finalName}.jar" includes="dev/tins/worldguardextraflagsplus/folialib/wrapper/task/WrappedBukkitTask.class"/>
+											</resourcecount>
+										</not>
+									</condition>
+								</fail>
+								<fail message="Shaded jar missing FoliaLib SpigotImplementation.">
+									<condition>
+										<not>
+											<resourcecount count="1">
+												<zipfileset src="${project.build.directory}/${project.build.finalName}.jar" includes="dev/tins/worldguardextraflagsplus/folialib/impl/SpigotImplementation.class"/>
+											</resourcecount>
+										</not>
+									</condition>
+								</fail>
+							</target>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
