@@ -1,6 +1,6 @@
 ﻿# WorldGuard ExtraFlags Plus
 
-**Release 4.4.0** — Bukkit plugin extension for [WorldGuard](https://github.com/EngineHub/WorldGuard).
+**Release 4.4.1** — Bukkit plugin extension for [WorldGuard](https://github.com/EngineHub/WorldGuard).
 
 ## ⚠️ Warning DO NOT USE BOTH PLUGINS TOGETHER!
 
@@ -25,6 +25,7 @@
 - **Keep-inventory + combat log** | DeluxeCombat restore when combat-logging in keep-inventory regions ✅
 - **Member-only allow-block-place/break** | Optional `require-membership` in config ✅
 - **hide-players flag** (experimental) | Hub/lobby visibility optimization — opt-in in config ✅
+- **Session tick performance** | Faster `blocked-effects`, `give-effects`, and `play-sounds` handlers when flags are inactive ✅
 - New Flag **"villager-trade"** | Control villager trading in regions ✅
 - New Flag **"disable-collision"** | Disable player collision in regions ✅
   - *Uses Minecraft's native scoreboard teams to control collision. TAB plugin is supported with API integration. May conflict with other plugins that use teams. See [documentation](public-documents/disable-collision%20flag%20documentation.md) for details.*
@@ -55,5 +56,5 @@ WorldGuard ExtraFlags Plus is extension to WorldGuard that adds 38+ new flags!
 
 ## Support & Community
 
-- 📜 **Changelog:** [CHANGELOG.md](CHANGELOG.md) (release **4.4.0**)
+- 📜 **Changelog:** [CHANGELOG.md](CHANGELOG.md) (release **4.4.1**)
 - 💬 **Discord:** [Join our Discord server](https://discord.gg/TCJAwsdqum)
